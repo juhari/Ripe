@@ -72,36 +72,30 @@ PhysicsDemo.inherit(Layer, {
     },
 
     computeTorque: function(omega, rightFlag, leftFlag) {
-        /*if(rightFlag === 1) { 
-            return -5
-        }
-        if(leftFlag === 1) { 
-            return 5
-        }*/
-
         var k = 1
-        var b = 5
+        var enginePower = 15
+        var brakePower = 5;
         var torque = 0
 
         if(omega < 0) {
             if(rightFlag === 1) { 
-                torque = -(k*omega + b)
+                torque = -(k*omega + enginePower)
             }
             if(leftFlag === 1) { 
-                torque = b 
+                torque = brakePower
             }
 
         }
         else {
             if(rightFlag === 1) { 
-                torque = -b
+                torque = -brakePower
             }
             if(leftFlag === 1) { 
-                torque = k*(-1*omega) + b
+                torque = k*(-1*omega) + enginePower
             }
         }
 
-        console.log("Torque: " + torque + " Omega: " + omega)
+        //console.log("Torque: " + torque + " Omega: " + omega)
         return torque
     },
 
@@ -111,7 +105,6 @@ PhysicsDemo.inherit(Layer, {
 
         var wheels = this.wheels
         for (var i = 0, len = wheels.length; i < len; i++) {
-            console.log("Apply forces")
             var wheel = wheels[i]
             var torque = this.computeTorque(wheel.GetAngularVelocity(), this.rightFlag, this.leftFlag)
             wheel.ApplyTorque(torque)
@@ -145,23 +138,8 @@ PhysicsDemo.inherit(Layer, {
 
         var bodyDef = new box2d.b2BodyDef
 
-        //create ground
-        bodyDef.type = box2d.b2Body.b2_staticBody
-        fixDef.shape = new box2d.b2PolygonShape
 
-        fixDef.shape.SetAsBox(20, 2)
-        bodyDef.position.Set(10, 400 / 30 + 2)
-        world.CreateBody(bodyDef).CreateFixture(fixDef)
-        
-        bodyDef.position.Set(10, -2)
-        world.CreateBody(bodyDef).CreateFixture(fixDef)
-
-        fixDef.shape.SetAsBox(2, 14)
-        bodyDef.position.Set(-2, 13)
-        world.CreateBody(bodyDef).CreateFixture(fixDef)
-        
-        bodyDef.position.Set(22, 13)
-        world.CreateBody(bodyDef).CreateFixture(fixDef)
+        this.createGround(fixDef, bodyDef, world)
 
 
         //create some objects
@@ -184,7 +162,42 @@ PhysicsDemo.inherit(Layer, {
 
         this.rightFlag = 0
         this.leftFlag = 0
-    }, 
+    },
+
+    createGround: function(fixDef, bodyDef, world) {
+
+        var body;
+        var scale = 1.0
+
+        var sprite
+        sprite = this.createCrate(new geo.Point(bodyDef.position.x * 30, bodyDef.position.y * 30), scale)
+
+        bodyDef.type = box2d.b2Body.b2_staticBody
+        fixDef.shape = new box2d.b2PolygonShape
+        fixDef.shape.SetAsBox(20, 2)
+
+        bodyDef.position.Set(10, 2)
+        body = world.CreateBody(bodyDef).CreateFixture(fixDef)
+        sprite = this.createCrate(new geo.Point(bodyDef.position.x * 30, bodyDef.position.y * 30), scale)
+        body.sprite = sprite
+
+        bodyDef.position.Set(10, -2)
+        body = world.CreateBody(bodyDef).CreateFixture(fixDef)
+        sprite = this.createCrate(new geo.Point(bodyDef.position.x * 30, bodyDef.position.y * 30), scale)
+        body.sprite = sprite
+
+        fixDef.shape.SetAsBox(2, 14)
+        bodyDef.position.Set(-2, 13)
+        body = world.CreateBody(bodyDef).CreateFixture(fixDef)
+        sprite = this.createCrate(new geo.Point(bodyDef.position.x * 30, bodyDef.position.y * 30), scale)
+        body.sprite = sprite
+
+        bodyDef.position.Set(22, 13)
+        body = world.CreateBody(bodyDef).CreateFixture(fixDef)
+        sprite = this.createCrate(new geo.Point(bodyDef.position.x * 30, bodyDef.position.y * 30), scale)
+        body.sprite = sprite
+        //console.log(body)
+    },
 
     keyUp: function(evt) {
         console.log(evt)
