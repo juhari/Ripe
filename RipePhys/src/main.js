@@ -20,6 +20,8 @@ var ControlEnum = {
     NEUTRAL: 0
 }
 
+var pixelsPerMeter = 30;
+
 function PhysicsDemo () {
     PhysicsDemo.superclass.constructor.call(this)
 
@@ -51,10 +53,26 @@ PhysicsDemo.inherit(Layer, {
 
     createCrate: function (point, scale) {
         scale = scale || 1
-        var sprite = new nodes.Sprite({file: '/resources/crate.jpg'})
+        var sprite = new nodes.Sprite({file: '/resources/asfalt.jpg'})
         sprite.position = point
 
-        sprite.scale = scale /2
+        sprite.scaleY = scale / 10;
+        sprite.scaleX = scale / 2;
+
+        this.addChild(sprite)
+        return sprite
+    },
+
+    createGroundSprite: function(point, bodyWidth, bodyHeight) {
+
+        var sprite = new nodes.Sprite({file: '/resources/asfalt.jpg'})
+        sprite.position = point
+
+        var spriteSize = sprite._contentSize;
+        var bodyWidthPixels = bodyWidth*2*pixelsPerMeter;
+        var bodyHeightPixels = bodyHeight*2*pixelsPerMeter;
+        sprite.scaleY = bodyHeightPixels/spriteSize.height;
+        sprite.scaleX = bodyWidthPixels/spriteSize.width;
 
         this.addChild(sprite)
         return sprite
@@ -73,7 +91,7 @@ PhysicsDemo.inherit(Layer, {
 
     computeTorque: function(omega, rightFlag, leftFlag) {
         var k = 1
-        var enginePower = 15
+        var enginePower = 45;
         var brakePower = 5;
         var torque = 0
 
@@ -118,7 +136,7 @@ PhysicsDemo.inherit(Layer, {
             var body = bodies[i],
             pos = body.GetPosition(),
             angle = geo.radiansToDegrees(-body.GetAngle())
-            body.sprite.position = new geo.Point(pos.x * 30, pos.y * 30)
+            body.sprite.position = new geo.Point(pos.x * pixelsPerMeter, pos.y * pixelsPerMeter)
             body.sprite.rotation = angle
         }
     },
@@ -130,10 +148,9 @@ PhysicsDemo.inherit(Layer, {
         )
         this.world = world
 
-
         var fixDef = new box2d.b2FixtureDef
         fixDef.density = 1.0
-        fixDef.friction = 0.5
+        fixDef.friction = 1.5
         fixDef.restitution = 0.2
 
         var bodyDef = new box2d.b2BodyDef
@@ -151,8 +168,8 @@ PhysicsDemo.inherit(Layer, {
         var scale = 0.5,
         width = scale * 32
 
-        fixDef.shape = new box2d.b2CircleShape(width/30)
-        var sprite = this.createBall(new geo.Point(bodyDef.position.x * 30, bodyDef.position.y * 30), scale)
+        fixDef.shape = new box2d.b2CircleShape(width/pixelsPerMeter)
+        var sprite = this.createBall(new geo.Point(bodyDef.position.x * pixelsPerMeter, bodyDef.position.y * pixelsPerMeter), scale)
 
         var bdy = world.CreateBody(bodyDef)
         bdy.sprite = sprite
@@ -170,7 +187,6 @@ PhysicsDemo.inherit(Layer, {
         var scale = 1.0
 
         var sprite
-        sprite = this.createCrate(new geo.Point(bodyDef.position.x * 30, bodyDef.position.y * 30), scale)
 
         bodyDef.type = box2d.b2Body.b2_staticBody
         fixDef.shape = new box2d.b2PolygonShape
@@ -178,25 +194,24 @@ PhysicsDemo.inherit(Layer, {
 
         bodyDef.position.Set(10, 2)
         body = world.CreateBody(bodyDef).CreateFixture(fixDef)
-        sprite = this.createCrate(new geo.Point(bodyDef.position.x * 30, bodyDef.position.y * 30), scale)
+        sprite = this.createGroundSprite(new geo.Point(bodyDef.position.x * pixelsPerMeter, bodyDef.position.y * pixelsPerMeter), 20, 2)
         body.sprite = sprite
 
-        bodyDef.position.Set(10, -2)
-        body = world.CreateBody(bodyDef).CreateFixture(fixDef)
-        sprite = this.createCrate(new geo.Point(bodyDef.position.x * 30, bodyDef.position.y * 30), scale)
-        body.sprite = sprite
 
         fixDef.shape.SetAsBox(2, 14)
         bodyDef.position.Set(-2, 13)
         body = world.CreateBody(bodyDef).CreateFixture(fixDef)
-        sprite = this.createCrate(new geo.Point(bodyDef.position.x * 30, bodyDef.position.y * 30), scale)
-        body.sprite = sprite
 
-        bodyDef.position.Set(22, 13)
+        bodyDef.position.Set(23.5, 13)
         body = world.CreateBody(bodyDef).CreateFixture(fixDef)
-        sprite = this.createCrate(new geo.Point(bodyDef.position.x * 30, bodyDef.position.y * 30), scale)
+
+        fixDef.shape.SetAsOrientedBox(5, 5, new box2d.b2Vec2(0, 0), Math.PI/4);
+        bodyDef.position.Set(10, 4);
+        body = world.CreateBody(bodyDef).CreateFixture(fixDef);
+        sprite = this.createGroundSprite(new geo.Point((bodyDef.position.x) * pixelsPerMeter, bodyDef.position.y * pixelsPerMeter), 5, 5)
+        sprite.rotation=(-geo.radiansToDegrees(Math.PI/4));
+        console.log(body);
         body.sprite = sprite
-        //console.log(body)
     },
 
     keyUp: function(evt) {
