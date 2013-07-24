@@ -97,7 +97,7 @@ PhysicsDemo.inherit(Layer, {
                 torque = -b
             }
             if(leftFlag === 1) { 
-                torque = k*omega + b
+                torque = k*(-1*omega) + b
             }
         }
 
@@ -113,8 +113,7 @@ PhysicsDemo.inherit(Layer, {
         for (var i = 0, len = wheels.length; i < len; i++) {
             console.log("Apply forces")
             var wheel = wheels[i]
-            var torque = 5//this.computeTorque(wheel.GetAngularVelocity(), 
-            //this.rightFlag, this.leftFlag)
+            var torque = this.computeTorque(wheel.GetAngularVelocity(), this.rightFlag, this.leftFlag)
             wheel.ApplyTorque(torque)
         }
 
