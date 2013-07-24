@@ -22,7 +22,7 @@ var ControlEnum = {
 
 var pixelsPerMeter = 30;
 
-function PhysicsDemo () {
+function PhysicsDemo (scene) {
     PhysicsDemo.superclass.constructor.call(this)
 
     this.isMouseEnabled = true
@@ -36,6 +36,7 @@ function PhysicsDemo () {
     // Get size of canvas
     var s = Director.sharedDirector.winSize
 
+    this.scene = scene
     this.demo()
     this.scheduleUpdate()
 }
@@ -43,10 +44,12 @@ function PhysicsDemo () {
 // Create a new layer
 PhysicsDemo.inherit(Layer, {
     world: null,
+    scene: null,
     bodies: null,
     selectedBody: null,
     mouseJoint: null,
     wheels: null,
+    centerBody: null,
     control: null,
     rigthFlag: null,
     leftFlag: null,
@@ -119,7 +122,8 @@ PhysicsDemo.inherit(Layer, {
 
     update: function (dt) {
         var world = this.world,
-            mouseJoint = this.mouseJoint
+        mouseJoint = this.mouseJoint,
+        scene = this.scene
 
         var wheels = this.wheels
         for (var i = 0, len = wheels.length; i < len; i++) {
@@ -130,13 +134,22 @@ PhysicsDemo.inherit(Layer, {
 
         world.Step(dt, 10, 10)
         world.ClearForces()
+        
+        var pos = this.centerBody.GetPosition()
+        var scenePos = new geo.Point(-pos.x * pixelsPerMeter + 
+                                     scene.contentSize.width/2,
+                                     -pos.y * pixelsPerMeter + 
+                                     scene.contentSize.height/2)        
+        scene.position = scenePos
 
         var bodies = this.bodies
         for (var i = 0, len = bodies.length; i < len; i++) {
             var body = bodies[i],
             pos = body.GetPosition(),
-            angle = geo.radiansToDegrees(-body.GetAngle())
-            body.sprite.position = new geo.Point(pos.x * pixelsPerMeter, pos.y * pixelsPerMeter)
+            angle = geo.radiansToDegrees(-body.GetAngle()),
+            point = new geo.Point(pos.x * pixelsPerMeter, 
+                                  pos.y * pixelsPerMeter)
+            body.sprite.position = point
             body.sprite.rotation = angle
         }
     },
@@ -175,6 +188,7 @@ PhysicsDemo.inherit(Layer, {
         bdy.sprite = sprite
         this.bodies.push(bdy)
         this.wheels.push(bdy)
+        this.centerBody = bdy
         bdy.CreateFixture(fixDef)
 
         this.rightFlag = 0
@@ -281,7 +295,7 @@ function main () {
     events.addListener(director, 'ready', function (director) {
         // Create a scene and layer
         var scene = new Scene()
-          , layer = new PhysicsDemo()
+          , layer = new PhysicsDemo(scene)
 
         // Add our layer to the scene
         scene.addChild(layer)
