@@ -40,7 +40,7 @@ PhysicsDemo.inherit(Layer, {
 
     createCrate: function (point, scale) {
         scale = scale || 1
-        var sprite = new cocos.nodes.Sprite({file: 'resources/crate.jpg'})
+        var sprite = new nodes.Sprite({file: '/resources/crate.jpg'})
         sprite.position = point
 
         sprite.scale = scale /2
@@ -51,7 +51,7 @@ PhysicsDemo.inherit(Layer, {
 
     createBall: function (point, scale) {
         scale = scale || 1
-        var sprite = new cocos.nodes.Sprite({file: 'resources/ball.png'})
+        var sprite = new nodes.Sprite({file: '/resources/ball.png'})
         sprite.position = point
 
         sprite.scale = scale
@@ -255,6 +255,7 @@ function main () {
 
     // Get director singleton
     var director = Director.sharedDirector
+    director.displayFPS = true
 
     // Wait for the director to finish preloading our assets
     events.addListener(director, 'ready', function (director) {
