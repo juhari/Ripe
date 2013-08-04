@@ -159,8 +159,8 @@ var Helloworld = cc.Layer.extend({
         fixDef.shape = new b2CircleShape(width/pixelsPerMeter);
 
         var bdy = this.world.CreateBody(bodyDef);
-        bdy.renderer = new DebugShapeRenderer(bdy);
-        this.addChild(bdy.renderer);
+        var renderer = new DebugShapeRenderer(bdy);
+        this.addChild(renderer);
         this.bodies.push(bdy);
         this.wheels.push(bdy);
         this.centerBody = bdy;
