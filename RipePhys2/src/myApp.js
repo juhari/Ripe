@@ -76,17 +76,6 @@ var Helloworld = cc.Layer.extend({
         return sprite
     },
 
-    createBall: function (point, scale) {
-        scale = scale || 1;
-        var sprite = cc.Sprite.create("res/ball.png");
-        sprite.setPosition(point);
-
-        sprite.setScale(scale);
-
-        this.addChild(sprite);
-        return sprite
-    },
-
     computeTorque: function(omega, rightFlag, leftFlag) {
         var k = 1;
         var enginePower = 45;
@@ -136,17 +125,6 @@ var Helloworld = cc.Layer.extend({
             -pos.y * pixelsPerMeter +
                 this.getContentSize().height / 2);
         this.setPosition(scenePos);
-
-        var bodies = this.bodies;
-        for (var i = 0, len = bodies.length; i < len; i++) {
-            var body = bodies[i],
-                pos = body.GetPosition(),
-                angle = cc.RADIANS_TO_DEGREES(-body.GetAngle()),
-                point = new cc.Point(pos.x * pixelsPerMeter,
-                    pos.y * pixelsPerMeter);
-            body.sprite.setPosition(point);
-            body.sprite.setRotation(angle);
-        }
     },
 
     demo: function () {
@@ -179,10 +157,10 @@ var Helloworld = cc.Layer.extend({
             width = scale * 32;
 
         fixDef.shape = new b2CircleShape(width/pixelsPerMeter);
-        var sprite = this.createBall(new cc.Point(bodyDef.position.x * pixelsPerMeter, bodyDef.position.y * pixelsPerMeter), scale);
 
         var bdy = this.world.CreateBody(bodyDef);
-        bdy.sprite = sprite;
+        bdy.renderer = new DebugShapeRenderer(bdy);
+        this.addChild(bdy.renderer);
         this.bodies.push(bdy);
         this.wheels.push(bdy);
         this.centerBody = bdy;

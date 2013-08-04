@@ -39,6 +39,8 @@
         //SingleEngineFile:'',
         appFiles:[
             'src/resource.js',
+            'src/shapeRenderer.js',
+            'src/debugShapeRenderer.js',
             'src/myApp.js'//add your own files in order here
         ]
     };
