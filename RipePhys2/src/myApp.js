@@ -61,21 +61,6 @@ var Helloworld = cc.Layer.extend({
         return true;
     },
 
-    createGroundSprite: function(point, bodyWidth, bodyHeight) {
-
-        var sprite = cc.Sprite.create("res/asfalt.jpg");
-        sprite.setPosition(point);
-
-        var spriteSize = sprite.getTextureRect();
-        var bodyWidthPixels = bodyWidth*2*pixelsPerMeter;
-        var bodyHeightPixels = bodyHeight*2*pixelsPerMeter;
-        sprite.setScaleY(bodyHeightPixels/spriteSize.height);
-        sprite.setScaleX(bodyWidthPixels/spriteSize.width);
-
-        this.addChild(sprite);
-        return sprite
-    },
-
     computeTorque: function(omega, rightFlag, leftFlag) {
         var k = 1;
         var enginePower = 45;
@@ -133,13 +118,13 @@ var Helloworld = cc.Layer.extend({
             true                  //allow sleep
         );
 
+        this.createGround();
+
         var fixDef = new b2FixtureDef;
         fixDef.density = 1.0;
         fixDef.friction = 1.5;
         fixDef.restitution = 0.2;
 
-        this.createGround2();
-        //this.createGround(fixDef);
         this.createVehicle(fixDef);
 
         this.rightFlag = 0;
@@ -168,54 +153,33 @@ var Helloworld = cc.Layer.extend({
         bdy.CreateFixture(fixDef)
     },
 
-    createGround2: function() {
-        var fixDef = new b2FixtureDef;
-        fixDef.density = 1.0;
-        fixDef.friction = 1.5;
-        fixDef.restitution = 0.2;
+    createGround: function() {
+
+        vertices = new Array();
+        vertices[0] = new b2Vec2(-50, 2);
+        vertices[1] = new b2Vec2(10, 2);
+        vertices[2] = new b2Vec2(20, 15);
+        vertices[3] = new b2Vec2(30, 2);
+        vertices[4] = new b2Vec2(100, 2);
 
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
-        fixDef.shape = new b2PolygonShape;
-        v1 = new b2Vec2(-10, 2);
-        v2 = new b2Vec2(10, 2);
-        fixDef.shape.SetAsEdge(v1, v2);
         var bdy = this.world.CreateBody(bodyDef);
+
+        for (var i = 1, len = vertices.length; i < len; i++) {
+
+            var fixDef = new b2FixtureDef;
+            fixDef.density = 1.0;
+            fixDef.friction = 1.5;
+            fixDef.restitution = 0.2;
+            fixDef.shape = new b2PolygonShape;
+            fixDef.shape.SetAsEdge(vertices[i-1], vertices[i]);            
+            bdy.CreateFixture(fixDef)
+        }
+
         var renderer = new DebugShapeRenderer(bdy);
         this.addChild(renderer);
-        bdy.CreateFixture(fixDef)
 
-    },
-
-    createGround: function(fixDef) {
-
-        var bodyDef = new b2BodyDef;
-        var body;
-
-        var sprite;
-
-        bodyDef.type = b2Body.b2_staticBody;
-        fixDef.shape = new b2PolygonShape;
-        fixDef.shape.SetAsBox(20, 2);
-
-        bodyDef.position.Set(10, 2);
-        body = this.world.CreateBody(bodyDef).CreateFixture(fixDef);
-        sprite = this.createGroundSprite(new cc.Point(bodyDef.position.x * pixelsPerMeter, bodyDef.position.y * pixelsPerMeter), 20, 2);
-        body.sprite = sprite;
-
-        fixDef.shape.SetAsBox(2, 14);
-        bodyDef.position.Set(-2, 13);
-        this.world.CreateBody(bodyDef).CreateFixture(fixDef);
-
-        bodyDef.position.Set(23.5, 13);
-        this.world.CreateBody(bodyDef).CreateFixture(fixDef);
-
-        fixDef.shape.SetAsOrientedBox(5, 5, new b2Vec2(0, 0), Math.PI/4);
-        bodyDef.position.Set(10, 4);
-        body = this.world.CreateBody(bodyDef).CreateFixture(fixDef);
-        sprite = this.createGroundSprite(new cc.Point((bodyDef.position.x) * pixelsPerMeter, bodyDef.position.y * pixelsPerMeter), 5, 5);
-        sprite.setRotation(-cc.RADIANS_TO_DEGREES(Math.PI/4));
-        body.sprite = sprite
     },
 
     onKeyUp: function(keycode) {
