@@ -138,7 +138,8 @@ var Helloworld = cc.Layer.extend({
         fixDef.friction = 1.5;
         fixDef.restitution = 0.2;
 
-        this.createGround(fixDef);
+        this.createGround2();
+        //this.createGround(fixDef);
         this.createVehicle(fixDef);
 
         this.rightFlag = 0;
@@ -157,7 +158,7 @@ var Helloworld = cc.Layer.extend({
             width = scale * 32;
 
         fixDef.shape = new b2CircleShape(width/pixelsPerMeter);
-
+        
         var bdy = this.world.CreateBody(bodyDef);
         var renderer = new DebugShapeRenderer(bdy);
         this.addChild(renderer);
@@ -165,6 +166,25 @@ var Helloworld = cc.Layer.extend({
         this.wheels.push(bdy);
         this.centerBody = bdy;
         bdy.CreateFixture(fixDef)
+    },
+
+    createGround2: function() {
+        var fixDef = new b2FixtureDef;
+        fixDef.density = 1.0;
+        fixDef.friction = 1.5;
+        fixDef.restitution = 0.2;
+
+        var bodyDef = new b2BodyDef;
+        bodyDef.type = b2Body.b2_staticBody;
+        fixDef.shape = new b2PolygonShape;
+        v1 = new b2Vec2(-10, 2);
+        v2 = new b2Vec2(10, 2);
+        fixDef.shape.SetAsEdge(v1, v2);
+        var bdy = this.world.CreateBody(bodyDef);
+        var renderer = new DebugShapeRenderer(bdy);
+        this.addChild(renderer);
+        bdy.CreateFixture(fixDef)
+
     },
 
     createGround: function(fixDef) {
