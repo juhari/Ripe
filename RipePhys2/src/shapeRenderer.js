@@ -8,14 +8,14 @@
 
 
 var ShapeRenderer = cc.Layer.extend ({
-    _body: null,
+    _world: null,
 
-    ctor:function (body) {
+    ctor:function (world) {
         this._super();
-        this._body = body;
+        this._world = world;
     },
 
-    draw: function(shape) {
+    draw: function() {
         // empty implementation
     }
 

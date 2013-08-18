@@ -9,7 +9,8 @@ var b2Vec2 = Box2D.Common.Math.b2Vec2
 , b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape
 , b2CircleShape = Box2D.Collision.Shapes.b2CircleShape
 , b2RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef
-, b2PrismaticJointDef = Box2D.Dynamics.Joints.b2PrismaticJointDef;
+, b2PrismaticJointDef = Box2D.Dynamics.Joints.b2PrismaticJointDef
+, b2Joint = Box2D.Dynamics.Joints.b2Joint
 
 
 var Helloworld = cc.Layer.extend({
@@ -60,7 +61,7 @@ var Helloworld = cc.Layer.extend({
         this.setKeyboardEnabled(true);
         this.setTouchEnabled(true);
 
-        this.demo();
+        this.initWorld();
 
         this.scheduleUpdate();
 
@@ -136,11 +137,14 @@ var Helloworld = cc.Layer.extend({
         this.setPosition(scenePos);
     },
 
-    demo: function () {
+    initWorld: function () {
         this.world = new b2World(
             new b2Vec2(0, -10),    //gravity
             true                  //allow sleep
         );
+
+        var renderer = new DebugShapeRenderer(this.world);
+        this.addChild(renderer);
 
         this.createGround();
 
@@ -150,7 +154,6 @@ var Helloworld = cc.Layer.extend({
         fixDef.restitution = 0.2;
 
         this.createGround();
-        //this.createGround(fixDef);
         this.createVehicle();
 
         this.rightFlag = 0;
@@ -181,10 +184,6 @@ var Helloworld = cc.Layer.extend({
         this.wheels.push(wheelBody);
         this.centerBody = wheelBody;
         wheelBody.CreateFixture(wheelFixture);
-
-        // rendering
-        var renderer = new DebugShapeRenderer(wheelBody);
-        this.addChild(renderer);
         */
 
         var worldScale = pixelsPerMeter;
@@ -192,10 +191,10 @@ var Helloworld = cc.Layer.extend({
         // ************************ THE CAR ************************ //
         // shape
         var carShape = new b2PolygonShape();
-        carShape.SetAsBox(120/worldScale,20/worldScale);
+        carShape.SetAsBox(100/worldScale,10/worldScale);
         // fixture
         var carFixture = new b2FixtureDef();
-        carFixture.density=5;
+        carFixture.density=2;
         carFixture.friction=3;
         carFixture.restitution=0.3;
         carFixture.filter.groupIndex=-1;
@@ -208,10 +207,10 @@ var Helloworld = cc.Layer.extend({
         // ************************ THE TRUNK ************************ //
         // shape
         var trunkShape = new b2PolygonShape();
-        trunkShape.SetAsOrientedBox(40/worldScale,40/worldScale,new b2Vec2(-80/worldScale,60/worldScale));
+        trunkShape.SetAsOrientedBox(30/worldScale,20/worldScale,new b2Vec2(-70/worldScale,30/worldScale));
         // fixture
         var trunkFixture = new b2FixtureDef();
-        trunkFixture.density=1;
+        trunkFixture.density=0.1;
         trunkFixture.friction=3;
         trunkFixture.restitution=0.3;
         trunkFixture.filter.groupIndex=-1;
@@ -221,12 +220,12 @@ var Helloworld = cc.Layer.extend({
         var hoodShape = new b2PolygonShape();
         var carVector=new b2Vec2();
         carVector[0]=new b2Vec2(-40/worldScale,20/worldScale);
-        carVector[1]=new b2Vec2(-40/worldScale,100/worldScale);
-        carVector[2]=new b2Vec2(120/worldScale,20/worldScale);
+        carVector[1]=new b2Vec2(-40/worldScale,50/worldScale);
+        carVector[2]=new b2Vec2(100/worldScale,10/worldScale);
         hoodShape.SetAsVector(carVector,3);
         // fixture
         var hoodFixture = new b2FixtureDef();
-        hoodFixture.density=1;
+        hoodFixture.density=0.1;
         hoodFixture.friction=3;
         hoodFixture.restitution=0.3;
         hoodFixture.filter.groupIndex=-1;
@@ -240,17 +239,14 @@ var Helloworld = cc.Layer.extend({
         car.CreateFixture(hoodFixture);
         this.centerBody = car;
 
-        var renderer = new DebugShapeRenderer(car);
-        this.addChild(renderer);
-
         // ************************ THE AXLES ************************ //
         // shape
 
         var axleShape = new b2PolygonShape();
-        axleShape.SetAsBox(20/worldScale,20/worldScale);
+        axleShape.SetAsBox(6/worldScale,6/worldScale);
         // fixture
         var axleFixture = new b2FixtureDef();
-        axleFixture.density=0.5;
+        axleFixture.density=1;
         axleFixture.friction=3;
         axleFixture.restitution=0.3;
         axleFixture.shape=axleShape;
@@ -259,27 +255,22 @@ var Helloworld = cc.Layer.extend({
         var axleBodyDef = new b2BodyDef();
         axleBodyDef.type=b2Body.b2_dynamicBody;
         // the rear axle itself
-        axleBodyDef.position.Set(car.GetWorldCenter().x-(60/worldScale),car.GetWorldCenter().y-(65/worldScale));
+        axleBodyDef.position.Set(car.GetWorldCenter().x-(60/worldScale),car.GetWorldCenter().y-(35/worldScale));
         var rearAxle=this.world.CreateBody(axleBodyDef);
         rearAxle.CreateFixture(axleFixture);
-        renderer = new DebugShapeRenderer(rearAxle);
-        this.addChild(renderer);
 
         // the front axle itself
-        axleBodyDef.position.Set(car.GetWorldCenter().x+(75/worldScale),car.GetWorldCenter().y-(65/worldScale));
+        axleBodyDef.position.Set(car.GetWorldCenter().x+(75/worldScale),car.GetWorldCenter().y-(35/worldScale));
         var frontAxle=this.world.CreateBody(axleBodyDef);
         frontAxle.CreateFixture(axleFixture);
 
-        renderer = new DebugShapeRenderer(frontAxle);
-        this.addChild(renderer);
-
         // ************************ THE WHEELS ************************ //
         // shape
-        var wheelShape=new b2CircleShape(40/worldScale);
+        var wheelShape=new b2CircleShape(20/worldScale);
         // fixture
         var wheelFixture = new b2FixtureDef();
-        wheelFixture.density=1;
-        wheelFixture.friction=0.5;
+        wheelFixture.density=5;
+        wheelFixture.friction=0.6;
         wheelFixture.restitution=0.1;
         wheelFixture.filter.groupIndex=-1;
         wheelFixture.shape=wheelShape;
@@ -287,20 +278,15 @@ var Helloworld = cc.Layer.extend({
         var wheelBodyDef = new b2BodyDef();
         wheelBodyDef.type=b2Body.b2_dynamicBody;
         // the real wheel itself
-        wheelBodyDef.position.Set(car.GetWorldCenter().x-(60/worldScale),car.GetWorldCenter().y-(65/worldScale));
+        wheelBodyDef.position.Set(car.GetWorldCenter().x-(60/worldScale),car.GetWorldCenter().y-(35/worldScale));
         var rearWheel=this.world.CreateBody(wheelBodyDef);
         rearWheel.CreateFixture(wheelFixture);
         // the front wheel itself
-        wheelBodyDef.position.Set(car.GetWorldCenter().x+(75/worldScale),car.GetWorldCenter().y-(65/worldScale));
+        wheelBodyDef.position.Set(car.GetWorldCenter().x+(75/worldScale),car.GetWorldCenter().y-(35/worldScale));
         var frontWheel=this.world.CreateBody(wheelBodyDef);
         frontWheel.CreateFixture(wheelFixture);
 
         this.wheels = new Array(rearWheel, frontWheel);
-
-        renderer = new DebugShapeRenderer(rearWheel);
-        this.addChild(renderer);
-        renderer = new DebugShapeRenderer(frontWheel);
-        this.addChild(renderer);
 
         // ************************ REVOLUTE JOINTS ************************ //
         // rear joint
@@ -308,19 +294,19 @@ var Helloworld = cc.Layer.extend({
         var rearWheelRevoluteJointDef=new b2RevoluteJointDef();
         rearWheelRevoluteJointDef.Initialize(rearWheel,rearAxle,rearWheel.GetWorldCenter());
         rearWheelRevoluteJointDef.enableMotor=true;
-        rearWheelRevoluteJointDef.maxMotorTorque=1000;
+        rearWheelRevoluteJointDef.maxMotorTorque=500;
         this.rearWheelRevoluteJoint=this.world.CreateJoint(rearWheelRevoluteJointDef);
         // front joint
         var frontWheelRevoluteJointDef=new b2RevoluteJointDef();
         frontWheelRevoluteJointDef.Initialize(frontWheel,frontAxle,frontWheel.GetWorldCenter());
         frontWheelRevoluteJointDef.enableMotor=true;
-        frontWheelRevoluteJointDef.maxMotorTorque=1000;
+        frontWheelRevoluteJointDef.maxMotorTorque=500;
         this.frontWheelRevoluteJoint=this.world.CreateJoint(frontWheelRevoluteJointDef);
         // ************************ PRISMATIC JOINTS ************************ //
         //  definition
         var axlePrismaticJointDef=new b2PrismaticJointDef();
-        axlePrismaticJointDef.lowerTranslation=-20/worldScale;
-        axlePrismaticJointDef.upperTranslation=5/worldScale;
+        axlePrismaticJointDef.lowerTranslation=-25/worldScale;
+        axlePrismaticJointDef.upperTranslation=6/worldScale;
         axlePrismaticJointDef.enableLimit=true;
         axlePrismaticJointDef.enableMotor=true;
         // front axle
@@ -329,7 +315,6 @@ var Helloworld = cc.Layer.extend({
         // rear axle
         axlePrismaticJointDef.Initialize(car,rearAxle,rearAxle.GetWorldCenter(),new b2Vec2(0,1));
         var rearAxlePrismaticJoint=this.world.CreateJoint(axlePrismaticJointDef);
-
     },
 
     createGround: function() {
@@ -356,10 +341,6 @@ var Helloworld = cc.Layer.extend({
             fixDef.shape.SetAsEdge(vertices[i-1], vertices[i]);
             bdy.CreateFixture(fixDef)
         }
-
-        var renderer = new DebugShapeRenderer(bdy);
-        this.addChild(renderer);
-
     },
 
     onKeyUp: function(keycode) {
