@@ -7,17 +7,27 @@
  */
 
 var DebugShapeRenderer = ShapeRenderer.extend ({
+    prevVertex:null,
+    currVertex:null,
+    p1:null,
+    p2:null,
 
     ctor:function (body) {
         this._super(body);
+        this.prevVertex = new b2Vec2();
+        this.currVertex = new b2Vec2();
+        this.p1 = new cc.Point(0,0);
+        this.p2 = new cc.Point(0,0);
     },
 
     draw: function() {
 
+        var pos = this._body.GetPosition();
+        var angle = this._body.GetAngle();
+        var Rot = b2Mat22.FromAngle(-angle);
+
         for( var fixture = this._body.GetFixtureList(); fixture != null; fixture = fixture.GetNext() ) {
             var shape = fixture.GetShape();
-            var pos = this._body.GetPosition();
-            var angle = this._body.GetAngle();
             var type = shape.GetType();
             // only circle shape supported at the moment
             if( shape instanceof b2CircleShape ) {
@@ -29,19 +39,31 @@ var DebugShapeRenderer = ShapeRenderer.extend ({
                 cc.drawingUtil.drawCircle(point, radius, angle, 60, true);
             }
             if( shape instanceof b2PolygonShape ) {
-                var vertices = shape.GetVertices();                
+                var vertices = shape.GetVertices();
+
+
                 for (var i = 1, len = vertices.length; i < len; i++) {
+                    if(i === 1) { 
+                        this.prevVertex.Set(vertices[i-1].x, vertices[i-1].y);
+                        this.prevVertex.MulTM(Rot);
+                        this.prevVertex.Add(pos);             
+                    }                    
+
+
+                    this.currVertex.Set(vertices[i].x, vertices[i].y);
+                    this.currVertex.MulTM(Rot);
                     
-                    var R = b2Mat22.FromAngle(angle);
-                    var currVertex = vertices[i];                    
-                    var prevVertex = vertices[i-1];                    
+                    this.currVertex.Add(pos);
                     
-                    var p2 = new cc.Point((pos.x + currVertex.x) * pixelsPerMeter, 
-                                          (pos.y + currVertex.y) * pixelsPerMeter);
-                    var p1 = new cc.Point((pos.x + prevVertex.x) * pixelsPerMeter,
-                                          (pos.y + prevVertex.y) * pixelsPerMeter);
+
+                    this.p2.x = this.currVertex.x * pixelsPerMeter; 
+                    this.p2.y = this.currVertex.y * pixelsPerMeter;
+                    this.p1.x = this.prevVertex.x * pixelsPerMeter;
+                    this.p1.y = this.prevVertex.y * pixelsPerMeter;
+
                     cc.drawingUtil.setDrawColor4B(255,255,255,255);
-                    cc.drawingUtil.drawLine(p1, p2);
+                    cc.drawingUtil.drawLine(this.p1, this.p2);
+                    this.prevVertex.Set(this.currVertex.x, this.currVertex.y);
                 }
             }
         }

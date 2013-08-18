@@ -344,6 +344,7 @@ var Helloworld = cc.Layer.extend({
         var bodyDef = new b2BodyDef;
         bodyDef.type = b2Body.b2_staticBody;
         var bdy = this.world.CreateBody(bodyDef);
+        bdy.isNotClosed = true;
 
         for (var i = 1, len = vertices.length; i < len; i++) {
 
