@@ -1,6 +1,7 @@
 var pixelsPerMeter = 30;
 
 var b2Vec2 = Box2D.Common.Math.b2Vec2
+, b2Mat22 = Box2D.Common.Math.b2Mat22
 , b2BodyDef = Box2D.Dynamics.b2BodyDef
 , b2Body = Box2D.Dynamics.b2Body
 , b2FixtureDef = Box2D.Dynamics.b2FixtureDef
@@ -328,7 +329,7 @@ var Helloworld = cc.Layer.extend({
             fixDef.friction = 1.5;
             fixDef.restitution = 0.2;
             fixDef.shape = new b2PolygonShape;
-            fixDef.shape.SetAsEdge(vertices[i-1], vertices[i]);            
+            fixDef.shape.SetAsEdge(vertices[i-1], vertices[i]);
             bdy.CreateFixture(fixDef)
         }
 
