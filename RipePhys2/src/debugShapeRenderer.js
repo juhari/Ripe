@@ -67,7 +67,7 @@ var DebugShapeRenderer = ShapeRenderer.extend ({
 
                     cc.drawingUtil.setDrawColor4B(255,255,255,255);
                     cc.drawingUtil.drawLine(this.p1, this.p2);   
-                    if(i === len-1) {
+                    if(i === len-1 && this._body.isNotClosed != true) {
                         this.p1.x = this.firstVertex.x * pixelsPerMeter;
                         this.p1.y = this.firstVertex.y * pixelsPerMeter;
                         cc.drawingUtil.drawLine(this.p2, this.p1);   
