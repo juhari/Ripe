@@ -162,30 +162,6 @@ var Helloworld = cc.Layer.extend({
 
     createVehicle: function() {
 
-        /*
-        // Debug wheel
-        //***************************************************************
-
-        // fixture
-        var wheelFixture = new b2FixtureDef;
-        wheelFixture.density = 1.0;
-        wheelFixture.friction = 1.5;
-        wheelFixture.restitution = 0.2;
-
-        // body definition
-        var wheelBodyDef = new b2BodyDef;
-        wheelBodyDef.type = b2Body.b2_dynamicBody;
-        wheelBodyDef.position.x = 0;
-        wheelBodyDef.position.y = 5;
-
-        wheelFixture.shape = new b2CircleShape(16/pixelsPerMeter);
-
-        var wheelBody = this.world.CreateBody(wheelBodyDef);
-        this.wheels.push(wheelBody);
-        this.centerBody = wheelBody;
-        wheelBody.CreateFixture(wheelFixture);
-        */
-
         var worldScale = pixelsPerMeter;
 
         // ************************ THE CAR ************************ //
@@ -305,7 +281,7 @@ var Helloworld = cc.Layer.extend({
         // ************************ PRISMATIC JOINTS ************************ //
         //  definition
         var axlePrismaticJointDef=new b2PrismaticJointDef();
-        axlePrismaticJointDef.lowerTranslation=-25/worldScale;
+        axlePrismaticJointDef.lowerTranslation=-8/worldScale;
         axlePrismaticJointDef.upperTranslation=6/worldScale;
         axlePrismaticJointDef.enableLimit=true;
         axlePrismaticJointDef.enableMotor=true;

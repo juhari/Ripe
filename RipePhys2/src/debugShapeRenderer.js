@@ -23,12 +23,40 @@ var DebugShapeRenderer = ShapeRenderer.extend ({
     },
 
     draw: function() {
-
-        var bodies = this._world.GetBodyList();
-
         for( var body = this._world.GetBodyList(); body != null; body = body.GetNext() ) {
             this.drawBody(body);
         }
+        for( var joint = this._world.GetJointList(); joint != null; joint = joint.GetNext() ) {
+            this.drawJoint(joint);
+        }
+    },
+
+    drawJoint: function(joint) {
+        var anchorA = joint.GetAnchorA();
+        var bodyA = joint.GetBodyA().GetPosition();
+        var anchorB = joint.GetAnchorB();
+        var bodyB = joint.GetBodyB().GetPosition();
+
+
+        this.p2.x = anchorA.x * pixelsPerMeter;
+        this.p2.y = anchorA.y * pixelsPerMeter;
+        this.p1.x = bodyA.x * pixelsPerMeter;
+        this.p1.y = bodyA.y * pixelsPerMeter;
+
+        cc.drawingUtil.setDrawColor4B(0,0,255,255);
+        cc.drawingUtil.drawLine(this.p1, this.p2);
+
+        this.p2.x = anchorB.x * pixelsPerMeter;
+        this.p2.y = anchorB.y * pixelsPerMeter;
+        this.p1.x = bodyB.x * pixelsPerMeter;
+        this.p1.y = bodyB.y * pixelsPerMeter;
+        cc.drawingUtil.drawLine(this.p1, this.p2);
+
+        this.p2.x = anchorA.x * pixelsPerMeter;
+        this.p2.y = anchorA.y * pixelsPerMeter;
+        this.p1.x = anchorB.x * pixelsPerMeter;
+        this.p1.y = anchorB.y * pixelsPerMeter;
+        cc.drawingUtil.drawLine(this.p1, this.p2);
     },
 
     drawBody: function(body) {
