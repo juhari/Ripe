@@ -9,6 +9,7 @@
 var DebugShapeRenderer = ShapeRenderer.extend ({
     prevVertex:null,
     currVertex:null,
+    firstVertex:null,
     p1:null,
     p2:null,
 
@@ -16,6 +17,7 @@ var DebugShapeRenderer = ShapeRenderer.extend ({
         this._super(body);
         this.prevVertex = new b2Vec2();
         this.currVertex = new b2Vec2();
+        this.firstVertex = new b2Vec2();
         this.p1 = new cc.Point(0,0);
         this.p2 = new cc.Point(0,0);
     },
@@ -46,9 +48,11 @@ var DebugShapeRenderer = ShapeRenderer.extend ({
                     if(i === 1) { 
                         this.prevVertex.Set(vertices[i-1].x, vertices[i-1].y);
                         this.prevVertex.MulTM(Rot);
-                        this.prevVertex.Add(pos);             
+                        this.prevVertex.Add(pos);
+                        this.firstVertex.Set(this.prevVertex.x, 
+                                             this.prevVertex.y);
                     }                    
-
+                    
 
                     this.currVertex.Set(vertices[i].x, vertices[i].y);
                     this.currVertex.MulTM(Rot);
@@ -62,7 +66,12 @@ var DebugShapeRenderer = ShapeRenderer.extend ({
                     this.p1.y = this.prevVertex.y * pixelsPerMeter;
 
                     cc.drawingUtil.setDrawColor4B(255,255,255,255);
-                    cc.drawingUtil.drawLine(this.p1, this.p2);
+                    cc.drawingUtil.drawLine(this.p1, this.p2);   
+                    if(i === len-1) {
+                        this.p1.x = this.firstVertex.x * pixelsPerMeter;
+                        this.p1.y = this.firstVertex.y * pixelsPerMeter;
+                        cc.drawingUtil.drawLine(this.p2, this.p1);   
+                    }
                     this.prevVertex.Set(this.currVertex.x, this.currVertex.y);
                 }
             }
