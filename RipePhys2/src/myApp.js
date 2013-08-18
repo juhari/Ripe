@@ -25,6 +25,7 @@ var Helloworld = cc.Layer.extend({
     motorSpeed: 0,
     rearWheelRevoluteJoint: null,
     frontWheelRevoluteJoint: null,
+    scenePos: null,
 
     init:function () {
         var selfPointer = this;
@@ -62,6 +63,9 @@ var Helloworld = cc.Layer.extend({
         this.setTouchEnabled(true);
 
         this.initWorld();
+
+        // init scenePos variable for rendering
+        this.scenePos = new cc.Point();
 
         this.scheduleUpdate();
 
@@ -130,11 +134,9 @@ var Helloworld = cc.Layer.extend({
         
         
         var pos = this.centerBody.GetPosition();
-        var scenePos = new cc.Point(-pos.x * pixelsPerMeter +
-            this.getContentSize().width / 2,
-            -pos.y * pixelsPerMeter +
-                this.getContentSize().height / 2);
-        this.setPosition(scenePos);
+        this.scenePos.x = -pos.x * pixelsPerMeter + this.getContentSize().width / 2;
+        this.scenePos.y = -pos.y * pixelsPerMeter + this.getContentSize().height / 2;
+        this.setPosition(this.scenePos);
     },
 
     initWorld: function () {

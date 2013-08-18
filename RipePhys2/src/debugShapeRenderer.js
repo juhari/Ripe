@@ -12,6 +12,7 @@ var DebugShapeRenderer = ShapeRenderer.extend ({
     firstVertex:null,
     p1:null,
     p2:null,
+    rotMatrix:null,
 
     ctor:function (body) {
         this._super(body);
@@ -20,12 +21,15 @@ var DebugShapeRenderer = ShapeRenderer.extend ({
         this.firstVertex = new b2Vec2();
         this.p1 = new cc.Point(0,0);
         this.p2 = new cc.Point(0,0);
+        this.rotMatrix = b2Mat22.FromAngle(0);
     },
 
     draw: function() {
+        cc.drawingUtil.setDrawColor4B(255,255,255,255);
         for( var body = this._world.GetBodyList(); body != null; body = body.GetNext() ) {
             this.drawBody(body);
         }
+        cc.drawingUtil.setDrawColor4B(0,0,255,255);
         for( var joint = this._world.GetJointList(); joint != null; joint = joint.GetNext() ) {
             this.drawJoint(joint);
         }
@@ -42,8 +46,6 @@ var DebugShapeRenderer = ShapeRenderer.extend ({
         this.p2.y = anchorA.y * pixelsPerMeter;
         this.p1.x = bodyA.x * pixelsPerMeter;
         this.p1.y = bodyA.y * pixelsPerMeter;
-
-        cc.drawingUtil.setDrawColor4B(0,0,255,255);
         cc.drawingUtil.drawLine(this.p1, this.p2);
 
         this.p2.x = anchorB.x * pixelsPerMeter;
@@ -62,7 +64,7 @@ var DebugShapeRenderer = ShapeRenderer.extend ({
     drawBody: function(body) {
         var pos = body.GetPosition();
         var angle = body.GetAngle();
-        var Rot = b2Mat22.FromAngle(-angle);
+        this.rotMatrix.Set(-angle);
 
         for( var fixture = body.GetFixtureList(); fixture != null; fixture = fixture.GetNext() ) {
             var shape = fixture.GetShape();
@@ -73,7 +75,6 @@ var DebugShapeRenderer = ShapeRenderer.extend ({
                     pos.y * pixelsPerMeter)
                 var radius = shape.m_radius*pixelsPerMeter;
 
-                cc.drawingUtil.setDrawColor4B(255,255,255,255);
                 cc.drawingUtil.drawCircle(point, radius, angle, 60, true);
             }
             if( shape instanceof b2PolygonShape ) {
@@ -83,7 +84,7 @@ var DebugShapeRenderer = ShapeRenderer.extend ({
                 for (var i = 1, len = vertices.length; i < len; i++) {
                     if(i === 1) {
                         this.prevVertex.Set(vertices[i-1].x, vertices[i-1].y);
-                        this.prevVertex.MulTM(Rot);
+                        this.prevVertex.MulTM(this.rotMatrix);
                         this.prevVertex.Add(pos);
                         this.firstVertex.Set(this.prevVertex.x,
                             this.prevVertex.y);
@@ -91,7 +92,7 @@ var DebugShapeRenderer = ShapeRenderer.extend ({
 
 
                     this.currVertex.Set(vertices[i].x, vertices[i].y);
-                    this.currVertex.MulTM(Rot);
+                    this.currVertex.MulTM(this.rotMatrix);
 
                     this.currVertex.Add(pos);
 
@@ -101,7 +102,6 @@ var DebugShapeRenderer = ShapeRenderer.extend ({
                     this.p1.x = this.prevVertex.x * pixelsPerMeter;
                     this.p1.y = this.prevVertex.y * pixelsPerMeter;
 
-                    cc.drawingUtil.setDrawColor4B(255,255,255,255);
                     cc.drawingUtil.drawLine(this.p1, this.p2);
                     if(i === len-1 && body.isNotClosed != true) {
                         this.p1.x = this.firstVertex.x * pixelsPerMeter;
